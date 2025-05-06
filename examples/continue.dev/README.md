@@ -28,4 +28,5 @@ models:
 ```
 
 You can now chat with your Kaito model inside VSCode or Cursor.dev!
+
 ![continue_dev](continue_dev.png)
