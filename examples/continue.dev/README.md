@@ -5,7 +5,7 @@
 
 
 ### 2. Locate Your .continue Config File
-Open the Continue sidebar, click "Add Chat Model", then select "config_file".
+Open the Continue sidebar, click "Add Chat Model", then select "config_file". \
 By default, the config file is located at: `~/.continue/config.yaml`
 
 
