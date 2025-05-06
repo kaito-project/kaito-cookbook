@@ -27,7 +27,7 @@ api_base = "http://workspace-qwen-2-5-coder-32b-instruct:80/v1" # Base URL for y
 [github]
 deployment_type = "app"         # Set to "app" (default is "user")
 app_id = APP_ID                 # Your GitHub App ID
-webhook_secret = WEBHOOK_SECRET # (Optional) Your webhook secret
+webhook_secret = WEBHOOK_SECRET # Your webhook secret
 app_name = "kaito-pr-agent"     # Name of your app
 
 [config]
@@ -63,7 +63,7 @@ You can use the following repo for reference deployment YAMLs:
 
 ---
 
-## 6. Configure the Webhook URL and Finalize Setup
+## 6. Finish GitHub App Settings
 
 When prompted for the webhook URL in your GitHub App:
 
