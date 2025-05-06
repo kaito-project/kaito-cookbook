@@ -1,55 +1,81 @@
-To setup your own Kaito Powered PR-agent using Kaito do the following
+# Kaito Powered PR-Agent Setup Guide
 
+This guide will help you set up your own Kaito-powered PR-agent using Kaito and GitHub.
 
-Follow the following instructions for creating a GitHub App (https://qodo-merge-docs.qodo.ai/installation/github/#run-as-a-github-app)
+---
 
-...
+## 1. Create a GitHub App
 
-For step #5 in your .secrets file copy in the following additional settings:
+Follow the official instructions for creating a GitHub App:  
+[GitHub App Setup Guide](https://qodo-merge-docs.qodo.ai/installation/github/#run-as-a-github-app)
 
-So for, `qwen2.5-coder-32b-instruct` for example you would add the following fields under the corresponding sections:
+---
+
+## 2. Configure Your `.secrets` File
+
+For step #5, add the following settings to your `.secrets` file.  
+Example for the `qwen2.5-coder-32b-instruct` model:
 
 ```toml
 [config]
-# models
-model="hosted_vllm/qwen2.5-coder-32b-instruct" # Set by kaito
-fallback_models=["hosted_vllm/qwen2.5-coder-32b-instruct"] # Set by us
-
+model = "hosted_vllm/qwen2.5-coder-32b-instruct"         # Set by Kaito
+fallback_models = ["hosted_vllm/qwen2.5-coder-32b-instruct"] # Set by you
 
 [ollama]
-api_base = "http://workspace-qwen-2-5-coder-32b-instruct:80/v1" # Set by us - the base url for your kaito service
+api_base = "http://workspace-qwen-2-5-coder-32b-instruct:80/v1" # Base URL for your Kaito service
 
 [github]
-deployment_type = "app" # Set by us - set to user by default
-
-app_id = APP_ID  # Set by kaito - The GitHub App ID, replace with your own.
-webhook_secret = WEBHOOK_SECRET  # Set by us - Optional, may be commented out.
-app_name = "kaito-pr-agent" # Set by us
+deployment_type = "app"         # Set to "app" (default is "user")
+app_id = APP_ID                 # Your GitHub App ID
+webhook_secret = WEBHOOK_SECRET # (Optional) Your webhook secret
+app_name = "kaito-pr-agent"     # Name of your app
 
 [config]
-ai_timeout=600 # Set by us - Increase timeout
-custom_model_max_tokens=32768 # Set by us - for models not in the default list - set to your models maximum
+ai_timeout = 600                # Increase timeout
+custom_model_max_tokens = 32768 # Set to your model's maximum
 ```
 
-Then after pushing your image to docker repository. Run it in your AKS cluster. From here lets setup Azure Application Gateway Ingress Controller (AGIC) so that our GitHub App can make requests to our AKS container. Note that our this container must be in the same cluster as our kaito workspace. 
+---
 
-Follow these steps:
+## 3. Deploy Your Docker Image
 
-1. https://learn.microsoft.com/en-us/azure/application-gateway/for-containers/quickstart-deploy-application-gateway-for-containers-alb-controller
+After pushing your image to your Docker repository, deploy it to your AKS (Azure Kubernetes Service) cluster.
 
+---
 
-2. Bring your own deployment: https://learn.microsoft.com/en-us/azure/application-gateway/for-containers/quickstart-create-application-gateway-for-containers-byo-deployment
+## 4. Set Up Azure Application Gateway Ingress Controller (AGIC)
 
+To allow your GitHub App to communicate with your AKS container, set up AGIC.  
+**Note:** The container must be in the same cluster as your Kaito workspace.
 
-For reference YAMLs you can use the following repo: https://github.com/ishaansehgal99/kaito-pr-review-demo
-This repo includes the reference pr-agent deployment: `config/github-app/pr-agent-github-app-deployment.yaml` and service `config/github-app/pr-agent-github-app-service.yaml`
+- [Quickstart: Deploy Application Gateway for Containers (ALB Controller)](https://learn.microsoft.com/en-us/azure/application-gateway/for-containers/quickstart-deploy-application-gateway-for-containers-alb-controller)
+- [Bring Your Own Deployment](https://learn.microsoft.com/en-us/azure/application-gateway/for-containers/quickstart-create-application-gateway-for-containers-byo-deployment)
 
-Now you can finish the step 
-```
-Webhook URL: The URL of your app's server or the URL of the smee.io channel.
-```
+---
 
-Then in your Github App you can
-Set this to your AGIC endpoint (e.g. http://xxxxxxxxxx.xxxx.alb.azure.com/api/v1/github_webhooks)
-As well as set your webhook secret
+## 5. Reference YAMLs
+
+You can use the following repo for reference deployment YAMLs:  
+[ishaansehgal99/kaito-pr-review-demo](https://github.com/ishaansehgal99/kaito-pr-review-demo)
+
+- Deployment: `config/github-app/pr-agent-github-app-deployment.yaml`
+- Service: `config/github-app/pr-agent-github-app-service.yaml`
+
+---
+
+## 6. Configure the Webhook URL and Finalize Setup
+
+When prompted for the webhook URL in your GitHub App:
+
+- Use your AGIC endpoint, e.g.:
+  ```
+  http://<your-agic-endpoint>.alb.azure.com/api/v1/github_webhooks
+  ```
+- Set your webhook secret in the GitHub App settings (ensure it matches the value in your `.secrets` file).
+
+---
+
+## Troubleshooting & Support
+
+If you encounter issues, refer to the documentation links above or the reference repository for working YAMLs.
 
