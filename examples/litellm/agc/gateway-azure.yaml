@@ -1,0 +1,22 @@
+# Follow along first here: https://learn.microsoft.com/en-us/azure/application-gateway/for-containers/quickstart-deploy-application-gateway-for-containers-alb-controller?tabs=install-helm-windows
+# Then here to get things setup: https://learn.microsoft.com/en-us/azure/application-gateway/for-containers/quickstart-create-application-gateway-for-containers-managed-by-alb-controller?tabs=new-subnet-aks-vnet
+apiVersion: gateway.networking.k8s.io/v1beta1
+kind: Gateway
+metadata:
+  name: llm-gateway
+  namespace: litellm
+  annotations:
+    alb.networking.azure.io/alb-namespace: alb-infra
+    alb.networking.azure.io/alb-name: llm-gateway
+spec:
+  gatewayClassName: azure-alb-external  # this GatewayClass was created by ALB controller
+  listeners:
+    - name: http-listener
+      protocol: HTTP
+      port: 80
+      allowedRoutes:
+        namespaces:
+          from: All
+  # addresses:
+  # - type: alb.networking.azure.io/alb-frontend
+  #   value: $FRONTEND_NAME
