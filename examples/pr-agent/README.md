@@ -1,28 +1,28 @@
-# Kaito Powered PR-Agent Setup Guide
+# KAITO Powered PR-Agent Setup Guide
 
-This guide will help you set up your own Kaito-powered PR-agent using Kaito and GitHub.
+This guide will help you set up your own KAITO-powered PR-agent using KAITO and GitHub.
 
 ---
 
 ## 1. Create a GitHub App
 
-Follow the official instructions for creating a GitHub App:  
+Follow the official instructions for creating a GitHub App:
 [GitHub App Setup Guide](https://qodo-merge-docs.qodo.ai/installation/github/#run-as-a-github-app)
 
 ---
 
 ## 2. Configure Your `.secrets` File
 
-For step #5, add the following settings to your `.secrets` file.  
+For step #5, add the following settings to your `.secrets` file.
 Example for the `qwen2.5-coder-32b-instruct` model:
 
 ```toml
 [config]
-model = "hosted_vllm/qwen2.5-coder-32b-instruct"         # Set by Kaito
+model = "hosted_vllm/qwen2.5-coder-32b-instruct"         # Set by KAITO
 fallback_models = ["hosted_vllm/qwen2.5-coder-32b-instruct"] # Set by you
 
 [ollama]
-api_base = "http://workspace-qwen-2-5-coder-32b-instruct:80/v1" # Base URL for your Kaito service
+api_base = "http://workspace-qwen-2-5-coder-32b-instruct:80/v1" # Base URL for your KAITO service
 
 [github]
 deployment_type = "app"         # Set to "app" (default is "user")
@@ -45,8 +45,8 @@ After pushing your image to your Docker repository, deploy it to your AKS (Azure
 
 ## 4. Set Up Azure Application Gateway Ingress Controller (AGIC)
 
-To allow your GitHub App to communicate with your AKS container, set up AGIC.  
-**Note:** The container must be in the same cluster as your Kaito workspace.
+To allow your GitHub App to communicate with your AKS container, set up AGIC.
+**Note:** The container must be in the same cluster as your KAITO workspace.
 
 - [Quickstart: Deploy Application Gateway for Containers (ALB Controller)](https://learn.microsoft.com/en-us/azure/application-gateway/for-containers/quickstart-deploy-application-gateway-for-containers-alb-controller)
 - [Bring Your Own Deployment](https://learn.microsoft.com/en-us/azure/application-gateway/for-containers/quickstart-create-application-gateway-for-containers-byo-deployment)
@@ -55,7 +55,7 @@ To allow your GitHub App to communicate with your AKS container, set up AGIC.
 
 ## 5. Reference YAMLs
 
-You can use the following repo for reference deployment YAMLs:  
+You can use the following repo for reference deployment YAMLs:
 [ishaansehgal99/kaito-pr-review-demo](https://github.com/ishaansehgal99/kaito-pr-review-demo)
 
 - Deployment: `config/github-app/pr-agent-github-app-deployment.yaml`

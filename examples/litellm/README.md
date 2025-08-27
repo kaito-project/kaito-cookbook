@@ -11,7 +11,7 @@ This guide will help you set up the management gateway using [LiteLLM](https://g
 
 ![Component Architecture Diagram](./litellm-deploy.png)
 
-## 1) Create a Kaito workspace and retrieve the Service ClusterIP
+## 1) Create a KAITO workspace and retrieve the Service ClusterIP
 
 Create a KAITO workspace from [examples](https://github.com/kaito-project/kaito/blob/main/examples/inference/).
 
@@ -24,8 +24,8 @@ $ export WORKSPACE_SVC=$(kubectl get svc -n "$WORKSPACE_NS" "$WORKSPACE_NAME" -o
 
 # Retrieve model id
 $ kubectl run -it --rm --restart=Never curl --image=curlimages/curl -- \
-  curl -s http://$WORKSPACE_SVC/v1/models | jq  
- 
+  curl -s http://$WORKSPACE_SVC/v1/models | jq
+
 {
   "object": "list",
   "data": [
