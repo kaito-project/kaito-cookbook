@@ -34,6 +34,9 @@ Pull request agent using KAITO for code review automation
 ### [RAG Engine with llm-d](./examples/ragengine-llm-d)
 Retrieval-Augmented Generation engine built with KAITO and llm-d
 
+### [VS Code Copilot](./examples/vscode-copilot)
+Guide on using custom models created by KAITO in VS Code Copilot
+
 ## Code of Conduct
 
 KAITO has adopted the [Cloud Native Compute Foundation Code of Conduct](https://github.com/cncf/foundation/blob/main/code-of-conduct.md). For more information see the [KAITO Code of Conduct](CODE_OF_CONDUCT.md).
