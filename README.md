@@ -1,6 +1,7 @@
-## ✨ Kaito Cookbook
+## ✨ KAITO Cookbook
 
-A collection of guides, examples, and best practices for working with Kubernetes AI Toolchain Operator (Kaito). 
+A collection of guides, examples, and best practices for working with Kubernetes AI Toolchain Operator (KAITO).
 
 **License**
-MIT
+
+Apache License 2.0
