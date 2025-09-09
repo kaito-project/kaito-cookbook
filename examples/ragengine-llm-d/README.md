@@ -6,7 +6,7 @@ This guide comprises the creation of two distinct but related endpoints:
 
 ## Prerequisites
 
-- An AKS cluster on Kubernetes version 1.31+ with two [Standard_NV36ads_A10_v5](https://learn.microsoft.com/en-us/azure/virtual-machines/sizes/gpu-accelerated/nvadsa10v5-series?tabs=sizebasic) nodes (or equivalent instance types). You can follow [this guide](https://kaito-project.github.io/kaito/docs/kaito-on-byo-gpu-nodes/) on how to create an AKS cluster and a GPU nodepool.
+- An AKS cluster on Kubernetes version 1.31+ with two [Standard_NV36ads_A10_v5](https://learn.microsoft.com/en-us/azure/virtual-machines/sizes/gpu-accelerated/nvadsa10v5-series?tabs=sizebasic) nodes (or equivalent instance types). You can pre-provision the GPU nodes by following [this guide](https://learn.microsoft.com/en-us/azure/aks/use-nvidia-gpu?tabs=add-ubuntu-gpu-node-pool#options-for-using-nvidia-gpus).
 - [NVIDIA Device Plugin](https://learn.microsoft.com/en-us/azure/aks/use-nvidia-gpu?tabs=add-ubuntu-gpu-node-pool#nvidia-device-plugin-installation) installed
 - [uv](https://docs.astral.sh/uv/) installed
 - HuggingFace token with access to [meta-llama/Llama-3.1-8B-Instruct](https://huggingface.co/meta-llama/Llama-3.1-8B-Instruct)
