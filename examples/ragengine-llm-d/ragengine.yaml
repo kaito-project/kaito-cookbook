@@ -4,10 +4,10 @@ metadata:
   name: ragengine-llm-d
 spec:
   compute:
-    instanceType: "Standard_DS2_v2"
+    instanceType: "Standard_D2s_v4"
     labelSelector:
       matchLabels:
-        node.kubernetes.io/instance-type: Standard_DS2_v2
+        node.kubernetes.io/instance-type: Standard_D2s_v4
   embedding:
     local:
       modelID: "BAAI/bge-small-en-v1.5"
