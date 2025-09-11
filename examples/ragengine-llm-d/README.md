@@ -76,7 +76,7 @@ cd kaito-cookbook/examples/ragengine-llm-d
 
 3. Deploy [`RAGEngine`](./ragengine.yaml) custom resource.
 - Replace `<inference-url>` under `.spec.inferenceService.url` field with the ClusterIP of `infra-pd-inference-gateway-istio` service in `llm-d-pd` namespace.
-- Replace `.spec.compute.labelSelector.matchLabels` and `.spec.compute.instanceType` with the desired node selector and instance type. In most cases, your cluster should already have sufficient capacity to schedule the RAGService pod. For this example, I want to schedule it on an existing `Standard_DS2_v2` node.
+- Replace `.spec.compute.labelSelector.matchLabels` and `.spec.compute.instanceType` with the desired node selector and instance type. In most cases, your cluster should already have sufficient capacity to schedule the RAGService pod. For this example, we will schedule it on an existing `Standard_D2s_v4` node.
 > [!NOTE]
 > A GPU node is not required for RAGEngine, as it does not perform model inference. You can use a CPU-only node with sufficient CPU and memory resources for the RAGEngine pod.
 
