@@ -54,6 +54,8 @@ Add the following configuration to your VS Code `settings.json` file:
     }
 }
 ```
+You can also review and edit the settings.json file directly by opening it in the editor with the Preferences: Open User Settings (JSON) or Preferences: Open Workspace Settings (JSON) command in the Command Palette (Ctrl+Shift+P).
+
 
 ### Configuration Options
 - `name`: Friendly name for your model
