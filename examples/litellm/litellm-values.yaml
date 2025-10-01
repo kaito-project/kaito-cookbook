@@ -1,4 +1,5 @@
 db:
+  deployStandalone: false
   # Use an existing postgres server/cluster
   useExisting: true
 

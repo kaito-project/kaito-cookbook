@@ -1,7 +1,7 @@
 apiVersion: gateway.networking.k8s.io/v1beta1
 kind: HTTPRoute
 metadata:
-  name: pr-agent-app-route
+  name: litellm-app-route
   namespace: litellm
 spec:
   parentRefs:
@@ -20,7 +20,7 @@ spec:
           method: GET
       backendRefs:
         - name: litellm
-          port: 80
+          port: 4000
     # static files
     - matches:
         - path:
@@ -50,4 +50,4 @@ spec:
           method: PATCH
       backendRefs:
         - name: litellm
-          port: 80
+          port: 4000
