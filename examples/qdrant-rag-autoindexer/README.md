@@ -1,6 +1,6 @@
-# KAITO Qdrant RAGEengine + AutoIndexer Example
+# KAITO Qdrant RAGEngine + AutoIndexer Example
 
-This guide will walk through the setup of a KAITO RAGEngine backed by Qdrant vector database and autofilled with code and documentation by the KAITO AutoIndexer.
+This guide will walk through the setup of a [KAITO RAGEngine](https://kaito-project.github.io/kaito/docs/rag) backed by Qdrant vector database and autofilled with code and documentation by the [KAITO AutoIndexer](https://github.com/kaito-project/autoindexer).
 
 ## Cluster Creation
 
