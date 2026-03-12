@@ -53,7 +53,7 @@ You can choose between CPU-based or GPU-based nodes for your RAG workloads:
 
 #### Option A: CPU-Based RAG Nodes
 
-For cost-effective RAG workloads using CPU inference:
+For cost-effective RAG workloads using CPU nodes:
 
 ```bash
 az aks nodepool add \
@@ -132,7 +132,7 @@ helm upgrade --install kaito-ragengine kaito/ragengine \
 
    The provided configuration uses the **BYO (Bring Your Own) nodes** approach with `labelSelector` to target your pre-created nodepools.
    
-   **To use GPU nodes**: The default configuration targets GPU nodes with `workload: ragengine` label.
+   **To use GPU nodes**: The default configuration targets GPU nodes with `workload: ragengine` label. You may change the `instanceType` to reflect the GPU sku you have available to you.
    
    **To use CPU nodes**: Edit [`ragengine.yaml`](./ragengine.yaml) and:
    - Edit the `instanceType` field to match the CPU nodepool created earlier (`Standard_D8_v3`)
