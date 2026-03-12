@@ -1,22 +1,41 @@
 # KAITO Qdrant RAGEengine + AutoIndexer Example
 
-This guide will walk through the setup of a KAITO RAGEngine backed by Qdrant vector databse and autofilled with code and documentation by the KAITO AutoIndexer.
+This guide will walk through the setup of a KAITO RAGEngine backed by Qdrant vector database and autofilled with code and documentation by the KAITO AutoIndexer.
 
-## Prerequisites
+## Cluster Creation
 
-- An AKS cluster which you have gone through the [KAITO Azure Setup](https://kaito-project.github.io/kaito/docs/azure) for.
-- Access to [Standard_NV36ads_A10_v5](https://learn.microsoft.com/en-us/azure/virtual-machines/sizes/gpu-accelerated/nvadsa10v5-series?tabs=sizebasic) nodes (or equivalent instance types).
-
-## Clone the cookbook reposiutory
+1. Create a resource group for your AKS cluster:
 
 ```bash
-git clone https://github.com/kaito-project/kaito-cookbook.git
-cd kaito-cookbook/examples/rag-autoindexer
+az group create --name <RESOURCE_GROUP_NAME> --location <LOCATION>
 ```
 
-## Qdrant Setup
+2. Create an AKS cluster with node auto provisioning enabled:
 
-1. Provision nodes for qdrant using the az cli. Leverage the command below and swap out `RESOURCE_GROUP_NAME` and `CLUSTER_NAME` for your aks cluster.
+```bash
+az aks create \
+    --resource-group <RESOURCE_GROUP_NAME> \
+    --name <CLUSTER_NAME> \
+    --enable-cluster-autoscaler \
+    --min-count 1 \
+    --max-count 10 \
+    --node-count 3 \
+    --enable-addons monitoring \
+    --generate-ssh-keys \
+    --enable-node-auto-provisioning
+```
+
+3. Get credentials for your AKS cluster:
+
+```bash
+az aks get-credentials --resource-group <RESOURCE_GROUP_NAME> --name <CLUSTER_NAME>
+```
+
+## Nodepool Creation
+
+### Qdrant Pool Creation
+
+1. Create a dedicated nodepool for Qdrant using the Azure CLI:
 
 ```bash
 az aks nodepool add \
@@ -25,10 +44,53 @@ az aks nodepool add \
     --name qdrantpool \
     -s Standard_D16s_v5 \
     -c 1 \
-    --labels app=qdrant
+    --labels workload=qdrant
 ```
 
-2. Create [`Qdrant PVC`](./qdrant-pvc.yaml) for persistent storage of the vector db.
+### RAG Pool Creation
+
+You can choose between CPU-based or GPU-based nodes for your RAG workloads:
+
+#### Option A: CPU-Based RAG Nodes
+
+For cost-effective RAG workloads using CPU inference:
+
+```bash
+az aks nodepool add \
+    --resource-group <RESOURCE_GROUP_NAME> \
+    --cluster-name <CLUSTER_NAME> \
+    --name ragcpupool \
+    -s Standard_D8_v3 \
+    -c 1 \
+    --labels workload=ragengine
+```
+
+#### Option B: GPU-Based RAG Nodes
+
+For high-performance RAG workloads requiring GPU acceleration:
+
+```bash
+az aks nodepool add \
+    --resource-group <RESOURCE_GROUP_NAME> \
+    --cluster-name <CLUSTER_NAME> \
+    --name raggpupool \
+    -s Standard_NV36ads_A10_v5 \
+    -c 1 \
+    --labels workload=ragengine
+```
+
+*Note: GPU nodes require access to [Standard_NV36ads_A10_v5](https://learn.microsoft.com/en-us/azure/virtual-machines/sizes/gpu-accelerated/nvadsa10v5-series?tabs=sizebasic) instances or equivalent GPU-enabled node types.*
+
+## Clone the cookbook repository
+
+```bash
+git clone https://github.com/kaito-project/kaito-cookbook.git
+cd kaito-cookbook/examples/rag-autoindexer
+```
+
+## Qdrant Setup
+
+1. Create [`Qdrant PVC`](./qdrant-pvc.yaml) for persistent storage of the vector db.
 
 ```bash
 kubectl apply -f qdrant-pvc.yaml
@@ -66,7 +128,17 @@ helm upgrade --install kaito-ragengine kaito/ragengine \
   --take-ownership
 ```
 
-2. Deploy the [`Ragengine`](./ragengine.yaml) custom resource. If you are leveraging a different GPU sku, make sure you update the `instanceType` field within the resource definition to match your desired sku.
+2. Configure and deploy the [`ragengine.yaml`](./ragengine.yaml) custom resource.
+
+   The provided configuration uses the **BYO (Bring Your Own) nodes** approach with `labelSelector` to target your pre-created nodepools.
+   
+   **To use GPU nodes**: The default configuration targets GPU nodes with `workload: ragengine` label.
+   
+   **To use CPU nodes**: Edit [`ragengine.yaml`](./ragengine.yaml) and:
+   - Edit the `instanceType` field to match the CPU nodepool created earlier (`Standard_D8_v3`)
+   
+   **Alternative - Auto-provisioning**: If you prefer auto-provisioning instead of BYO nodes:
+   - Comment out the `labelSelector` section
 
 ```bash
 kubectl apply -f ragengine.yaml
@@ -137,4 +209,21 @@ kubectl port-forward svc/ragengine 5789:80
 curl -X POST http://localhost:5789/retrieve \
      -H "Content-Type: application/json" \
      -d '{"index_name": "kaito-codebase", "query": "what vector stores are supported in the RAGEngine?", "max_node_count": 5}'
+```
+
+3. Or Leverage the [`kaito-rag-engine-client`](https://pypi.org/project/kaito-rag-engine-client/) python library in your application to programatically create retrieve calls.
+
+```python
+from kaito_rag_engine_client import Client
+from kaito_rag_engine_client.models import RetrieveRequest
+from kaito_rag_engine_client.api.index import retrieve_index
+
+client = Client(base_url="http://localhost:5789")
+
+retrieve_resp = retrieve_index.sync(client=client, body=RetrieveRequest.from_dict({
+        "index_name": "test_index",
+        "query": "what can you tell me about AI?",
+        "max_node_count": 5,
+    }
+))
 ```

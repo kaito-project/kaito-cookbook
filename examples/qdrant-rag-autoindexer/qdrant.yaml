@@ -65,7 +65,7 @@ spec:
           name: qdrant-data
       dnsPolicy: ClusterFirst
       nodeSelector:
-        app: qdrant
+        workload: qdrant
       restartPolicy: Always
       schedulerName: default-scheduler
       securityContext: {}

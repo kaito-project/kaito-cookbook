@@ -6,13 +6,13 @@ metadata:
 spec:
   compute:
     count: 1
-    instanceType: Standard_NV36ads_A10_v5
+    instanceType: "Standard_NV36ads_A10_v5"
     labelSelector:
       matchLabels:
-        apps: ragengine
+        workload: ragengine
   embedding:
     local:
-      modelID: BAAI/bge-small-en-v1.5
+      modelID: "BAAI/bge-small-en-v1.5"
   inferenceService:
     contextWindowSize: 4096
   storage:
