@@ -16,13 +16,9 @@ az group create --name <RESOURCE_GROUP_NAME> --location <LOCATION>
 az aks create \
     --resource-group <RESOURCE_GROUP_NAME> \
     --name <CLUSTER_NAME> \
-    --enable-cluster-autoscaler \
-    --min-count 1 \
-    --max-count 10 \
-    --node-count 3 \
     --enable-addons monitoring \
     --generate-ssh-keys \
-    --enable-node-auto-provisioning
+    --node-provisioning-mode Auto
 ```
 
 3. Get credentials for your AKS cluster:
@@ -85,7 +81,7 @@ az aks nodepool add \
 
 ```bash
 git clone https://github.com/kaito-project/kaito-cookbook.git
-cd kaito-cookbook/examples/rag-autoindexer
+cd kaito-cookbook/examples/qdrant-rag-autoindexer
 ```
 
 ## Qdrant Setup
@@ -100,6 +96,12 @@ kubectl apply -f qdrant-pvc.yaml
 
 ```bash
 kubectl apply -f qdrant.yaml
+```
+
+3. Deploy [`Qdrant Service`](./qdrant-service.yaml) so the ragengine can communicate with qdrant.
+
+```bash
+kubectl apply -f qdrant-service.yaml
 ```
 
 ## KAITO Setup
@@ -120,12 +122,11 @@ helm upgrade --install kaito-workspace kaito/workspace \
 1. Install KAITO RAGEngine
 
 ```bash
-helm repo add kaito https://kaito-project.github.io/kaito/charts/kaito
-helm repo update
-helm upgrade --install kaito-ragengine kaito/ragengine \
-  --namespace kaito-ragengine \
-  --create-namespace \
-  --take-ownership
+helm upgrade --install kaito-ragengine oci://ghcr.io/kaito-project/charts/ragengine \
+--version 0.9.3-qdrant.2 \
+--namespace kaito-ragengine \
+--create-namespace \
+--take-ownership
 ```
 
 2. Configure and deploy the [`ragengine.yaml`](./ragengine.yaml) custom resource.
@@ -149,8 +150,6 @@ kubectl apply -f ragengine.yaml
 1. Install KAITO AutoIndexer
 
 ```bash
-helm repo add kaito https://kaito-project.github.io/kaito/charts/kaito
-helm repo update
 helm upgrade --install kaito-autoindexer oci://ghcr.io/kaito-project/charts/autoindexer \
 --version 0.0.0-dev.2 \
 --namespace kaito-autoindexer \
@@ -173,23 +172,18 @@ You can then validate the AutoIndexer logs are checking out the repository and i
 ```
 k logs kaito-code-autoindexer-job-2dxdg | grep body
 ...
-"body": "Loaded in-cluster Kubernetes configuration",
-"body": "AutoIndexer K8s client initialized for namespace: default, autoindexer: kaito-code-autoindexer",
-"body": "Kubernetes client initialized successfully",
-"body": "Found AutoIndexer CRD configuration, using it to supplement environment config",
-"body": "Applying configuration from AutoIndexer CRD",
-"body": "Using index name from CRD: aks-wikis-claw",
-"body": "Using RAG engine endpoint from CRD: http://ragengine.default.svc.cluster.local:80",
-"body": "Using data source type from CRD: Git",
-"body": "Updated Git data source configuration from CRD",
-"body": "Initialized 2 content handlers",
-"body": "Initialized git data source handler for repository: https://github.com/kaito-project/kaito.git",
-"body": "AutoIndexer initialized for index 'kaito-codebase' with data source type 'Git'",
-"body": "Starting document indexing process",
-"body": "Added condition 'AutoIndexerIndexing' to AutoIndexer default/kaito-code-autoindexer",
-"body": "Created working directory: /tmp/autoindexer_git_h1k94bs3",
-"body": "Cloning repository from https://github.com/kaito-project/kaito.git",
-"body": "Checked out branch: main",
+    "body": "Initialized git data source handler for repository: https://github.com/kaito-project/kaito.git",
+    "body": "AutoIndexer initialized for index 'kaito-codebase' with data source type 'Git'",
+    "body": "Starting document indexing process",
+    "body": "Added condition 'AutoIndexerIndexing' to AutoIndexer default/kaito-code-autoindexer",
+    "body": "Created working directory: /tmp/autoindexer_git_l1b_u0m4",
+    "body": "Cloning repository from https://github.com/kaito-project/kaito.git",
+    "body": "Current commit hash: 6d94fc5551a71477372d601f689f176025744f50",
+    "body": "Full repository indexing",
+    "body": "Found 361 files in repository for indexing",
+    "body": "Indexing batch of 10 documents (10/361 files processed)",
+    "body": "Indexing batch of 10 documents into index 'kaito-codebase'",
+    "body": "HTTP Request: POST http://ragengine.default.svc.cluster.local/index \"HTTP/1.1 200 OK\"",
 ...
 ```
 
