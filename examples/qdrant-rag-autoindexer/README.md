@@ -185,6 +185,14 @@ k logs kaito-code-autoindexer-job-2dxdg | grep body
     "body": "Indexing batch of 10 documents into index 'kaito-codebase'",
     "body": "HTTP Request: POST http://ragengine.default.svc.cluster.local/index \"HTTP/1.1 200 OK\"",
 ...
+    "body": "Updated AutoIndexer default/kaito-code-autoindexer status",
+    "body": "HTTP Request: GET http://ragengine.default.svc.cluster.local/indexes/kaito-codebase/documents?limit=1&offset=0&max_text_length=1000&metadata_filter=%7B%22autoindexer%22%3A+%22default_kaito-code-autoindexer%22%7D \"HTTP/1.1 200 OK\"",
+    "body": "Indexing completed successfully",
+    "body": "Added condition 'AutoIndexerIndexing' to AutoIndexer default/kaito-code-autoindexer",
+    "body": "Updating AutoIndexer default/kaito-code-autoindexer status with: {'lastIndexingTimestamp': '2026-03-20T17:08:05.915089Z', 'lastIndexingDurationSeconds': 800, 'numOfDocumentInIndex': 3787, 'successfulIndexingCount': 1}",
+    "body": "Updated AutoIndexer default/kaito-code-autoindexer status",
+    "body": "Created Kubernetes event 'IndexingCompleted' for AutoIndexer default/kaito-code-autoindexer",
+    "body": "AutoIndexer job completed successfully",
 ```
 
 ## Query The RAGEngine for Relevant Context
@@ -203,6 +211,10 @@ kubectl port-forward svc/ragengine 5789:80
 curl -X POST http://localhost:5789/retrieve \
      -H "Content-Type: application/json" \
      -d '{"index_name": "kaito-codebase", "query": "what vector stores are supported in the RAGEngine?", "max_node_count": 5}'
+```
+
+```bash
+{"query":"what vector stores are supported in the RAGEngine?","results":[{"doc_id":"420f1844f03344a453a464ad3954c17ea2bf7470cdbb7ce14762955afd0a769c","node_id":"66b83b7c-bad0-4938-bb4a-fc0e4a0c649d","text":"type RAGEngineSpec struct {\n\t// Compute specifies the dedicated GPU resource used by an embedding model running locally if required.\n\t// +optional\n\tCompute *ResourceSpec `json:\"compute,omitempty\"`\n\t// Storage specifies how to access the vector database used to save the embedding vectors.\n\t// If this field is not specified, by default, an in-memory vector DB will be used.\n\t// The data will not be persisted.\n\t// +optional\n\tStorage *StorageSpec `json:\"storage,omitempty\"`\n\t// Embedding specifies whether the RAG engine generates embedding vectors using a remote service\n\t// or using a embedding model running locally.\n\tEmbedding        *EmbeddingSpec        `json:\"embedding\"`\n\tInferenceService *InferenceServiceSpec `json:\"inferenceService\"`\n}\n\n// RAGEngineStatus defines the observed state of RAGEngine\ntype RAGEngineStatus struct {\n\t// WorkerNodes is the list of nodes chosen to run the workload based on the RAGEngine resource requirement.\n\t// +optional\n\tWorkerNodes []string `json:\"workerNodes,omitempty\"`\n\n\tConditions []metav1.Condition `json:\"conditions,omitempty\"`\n}\n\n// RAGEngine is the Schema for the ragengine API\n// +kubebuilder:object:root=true\n// +kubebuilder:subresource:status\n// +kubebuilder:resource:path=ragengines,scope=Namespaced,categories=ragengine,shortName=rag\n// +kubebuilder:storageversion\n// +kubebuilder:printcolumn:name=\"Instance\",type=\"string\",JSONPath=\".spec.compute.instanceType\",description=\"\"","score":0.5,"dense_score":0.7500975,"sparse_score":null,"source":"dense_only","metadata":{"autoindexer":"default_kaito-code-autoindexer","source_type":"git","repository":"https://github.com/kaito-project/kaito.git","branch":"main","file_path":"api/v1beta1/ragengine_types.go","change_type":"full","timestamp":"2026-03-20T17:06:09.571000Z","commit":"6d94fc5551a71477372d601f689f176025744f50","language":"go","split_type":"code"}},...],"count":5}
 ```
 
 3. Or Leverage the [`kaito-rag-engine-client`](https://pypi.org/project/kaito-rag-engine-client/) python library in your application to programatically create retrieve calls.
