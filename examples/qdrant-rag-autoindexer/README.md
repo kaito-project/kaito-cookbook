@@ -29,8 +29,6 @@ This script will:
 - Create RAGEngine and AutoIndexer custom resources
 - Provide monitoring and access commands
 
-The deployment includes Karpenter for advanced node provisioning capabilities, even in the local kind environment.
-
 Once deployed, you can validate the custom resources are deployed with `kubectl get ragai`.
 
 You can then validate the AutoIndexer logs are checking out the repository and indexing documents to the RAGEngine.
