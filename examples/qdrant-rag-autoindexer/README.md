@@ -2,7 +2,9 @@
 
 This guide will walk through the setup of a [KAITO RAGEngine](https://kaito-project.github.io/kaito/docs/rag) backed by Qdrant vector database and autofilled with code and documentation by the [KAITO AutoIndexer](https://github.com/kaito-project/autoindexer).
 
-## Cluster Creation
+## Azure Deployment
+
+### Cluster Creation
 
 1. Create a resource group for your AKS cluster:
 
@@ -27,9 +29,9 @@ az aks create \
 az aks get-credentials --resource-group <RESOURCE_GROUP_NAME> --name <CLUSTER_NAME>
 ```
 
-## Nodepool Creation
+### Nodepool Creation
 
-### Qdrant Pool Creation
+#### Qdrant Pool Creation
 
 1. Create a dedicated nodepool for Qdrant using the Azure CLI:
 
@@ -43,13 +45,9 @@ az aks nodepool add \
     --labels workload=qdrant
 ```
 
-### RAG Pool Creation
+#### RAG Pool Creation
 
-You can choose between CPU-based or GPU-based nodes for your RAG workloads:
-
-#### Option A: CPU-Based RAG Nodes
-
-For cost-effective RAG workloads using CPU nodes:
+For cost-effective RAG workloads we will use CPU nodes:
 
 ```bash
 az aks nodepool add \
@@ -61,91 +59,19 @@ az aks nodepool add \
     --labels workload=ragengine
 ```
 
-#### Option B: GPU-Based RAG Nodes
-
-For high-performance RAG workloads requiring GPU acceleration:
-
-```bash
-az aks nodepool add \
-    --resource-group <RESOURCE_GROUP_NAME> \
-    --cluster-name <CLUSTER_NAME> \
-    --name raggpupool \
-    -s Standard_NV36ads_A10_v5 \
-    -c 1 \
-    --labels workload=ragengine
-```
-
-*Note: GPU nodes require access to [Standard_NV36ads_A10_v5](https://learn.microsoft.com/en-us/azure/virtual-machines/sizes/gpu-accelerated/nvadsa10v5-series?tabs=sizebasic) instances or equivalent GPU-enabled node types.*
-
-## Clone the cookbook repository
+### Clone the cookbook repository
 
 ```bash
 git clone https://github.com/kaito-project/kaito-cookbook.git
 cd kaito-cookbook/examples/qdrant-rag-autoindexer
 ```
 
-## Qdrant Setup
+### Helm Deployment
 
-1. Create [`Qdrant PVC`](./qdrant-pvc.yaml) for persistent storage of the vector db.
-
-```bash
-kubectl apply -f qdrant-pvc.yaml
+```
+helm install qdrant-rag ./chart --wait --wait-for-jobs --timeout 10m
 ```
 
-2. Deploy [`Qdrant`](./qdrant.yaml) deployment.
-
-```bash
-kubectl apply -f qdrant.yaml
-```
-
-3. Deploy [`Qdrant Service`](./qdrant-service.yaml) so the ragengine can communicate with qdrant.
-
-```bash
-kubectl apply -f qdrant-service.yaml
-```
-
-## KAITO Setup
-1. Install KAITO Workload
-
-```bash
-helm repo add kaito https://kaito-project.github.io/kaito/charts/kaito
-helm repo update
-helm upgrade --install kaito-workspace kaito/workspace \
-  --namespace kaito-workspace \
-  --create-namespace \
-  --wait \
-  --take-ownership
-```
-
-## RAGEngine Setup
-
-1. Install KAITO RAGEngine
-
-```bash
-helm upgrade --install kaito-ragengine oci://ghcr.io/kaito-project/charts/ragengine \
---version 0.9.3-qdrant.2 \
---namespace kaito-ragengine \
---create-namespace \
---take-ownership
-```
-
-2. Configure and deploy the [`ragengine.yaml`](./ragengine.yaml) custom resource.
-
-   The provided configuration uses the **BYO (Bring Your Own) nodes** approach with `labelSelector` to target your pre-created nodepools.
-   
-   **To use GPU nodes**: The default configuration targets GPU nodes with `workload: ragengine` label. You may change the `instanceType` to reflect the GPU sku you have available to you.
-   
-   **To use CPU nodes**: Edit [`ragengine.yaml`](./ragengine.yaml) and:
-   - Edit the `instanceType` field to match the CPU nodepool created earlier (`Standard_D8_v3`)
-   
-   **Alternative - Auto-provisioning**: If you prefer auto-provisioning instead of BYO nodes:
-   - Comment out the `labelSelector` section
-
-```bash
-kubectl apply -f ragengine.yaml
-```
-
-## AutoIndexer Setup
 
 1. Install KAITO AutoIndexer
 

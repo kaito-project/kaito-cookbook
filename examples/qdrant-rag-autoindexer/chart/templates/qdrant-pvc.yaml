@@ -1,0 +1,19 @@
+{{- if .Values.qdrant.persistence.enabled }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "qdrant-rag.fullname" . }}-qdrant-storage
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "qdrant-rag.labels" . | nindent 4 }}
+    component: qdrant-storage
+spec:
+  accessModes:
+    - {{ .Values.qdrant.persistence.accessMode }}
+  resources:
+    requests:
+      storage: {{ .Values.qdrant.persistence.size }}
+  {{- if .Values.qdrant.persistence.storageClass }}
+  storageClassName: {{ .Values.qdrant.persistence.storageClass }}
+  {{- end }}
+{{- end }}

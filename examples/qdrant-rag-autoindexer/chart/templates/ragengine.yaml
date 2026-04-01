@@ -1,0 +1,30 @@
+{{- if .Values.ragengine.enabled }}
+apiVersion: kaito.sh/v1beta1
+kind: RAGEngine
+metadata:
+  name: {{ .Values.ragengine.name }}
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "qdrant-rag.labels" . | nindent 4 }}
+    component: ragengine
+spec:
+  compute:
+    count: {{ .Values.ragengine.compute.count }}
+    instanceType: {{ .Values.ragengine.compute.instanceType | quote }}
+    {{- if .Values.ragengine.compute.labelSelector }}
+    labelSelector:
+      matchLabels:
+        {{- toYaml .Values.ragengine.compute.labelSelector | nindent 8 }}
+    {{- end }}
+  embedding:
+    {{- if .Values.ragengine.embedding.local }}
+    local:
+      modelID: {{ .Values.ragengine.embedding.local.modelID | quote }}
+    {{- end }}
+  inferenceService:
+    contextWindowSize: {{ .Values.ragengine.inferenceService.contextWindowSize }}
+  storage:
+    vectorDB:
+      engine: {{ .Values.ragengine.storage.vectorDB.engine }}
+      url: http://{{ include "qdrant-rag.fullname" . }}-qdrant.{{ .Values.namespace }}.svc.cluster.local:{{ .Values.qdrant.service.httpPort }}
+{{- end }}
