@@ -2,93 +2,34 @@
 
 This guide will walk through the setup of a [KAITO RAGEngine](https://kaito-project.github.io/kaito/docs/rag) backed by Qdrant vector database and autofilled with code and documentation by the [KAITO AutoIndexer](https://github.com/kaito-project/autoindexer).
 
-## Azure Deployment
+## Quick Start with Kind (Local Development)
 
-### Cluster Creation
+For local development and testing, you can use the provided kind deployment script:
 
-1. Create a resource group for your AKS cluster:
+### Prerequisites
 
-```bash
-az group create --name <RESOURCE_GROUP_NAME> --location <LOCATION>
-```
+- [Docker](https://docs.docker.com/get-docker/) installed and running
+- [kind](https://kind.sigs.k8s.io/docs/user/quick-start/) installed
+- [kubectl](https://kubernetes.io/docs/tasks/tools/) installed  
+- [helm](https://helm.sh/docs/intro/install/) installed
 
-2. Create an AKS cluster with node auto provisioning enabled:
-
-```bash
-az aks create \
-    --resource-group <RESOURCE_GROUP_NAME> \
-    --name <CLUSTER_NAME> \
-    --enable-addons monitoring \
-    --generate-ssh-keys \
-    --node-provisioning-mode Auto
-```
-
-3. Get credentials for your AKS cluster:
-
-```bash
-az aks get-credentials --resource-group <RESOURCE_GROUP_NAME> --name <CLUSTER_NAME>
-```
-
-### Nodepool Creation
-
-#### Qdrant Pool Creation
-
-1. Create a dedicated nodepool for Qdrant using the Azure CLI:
-
-```bash
-az aks nodepool add \
-    --resource-group <RESOURCE_GROUP_NAME> \
-    --cluster-name <CLUSTER_NAME> \
-    --name qdrantpool \
-    -s Standard_D16s_v5 \
-    -c 1 \
-    --labels workload=qdrant
-```
-
-#### RAG Pool Creation
-
-For cost-effective RAG workloads we will use CPU nodes:
-
-```bash
-az aks nodepool add \
-    --resource-group <RESOURCE_GROUP_NAME> \
-    --cluster-name <CLUSTER_NAME> \
-    --name ragcpupool \
-    -s Standard_D8_v3 \
-    -c 1 \
-    --labels workload=ragengine
-```
-
-### Clone the cookbook repository
+### Deploy to Kind
 
 ```bash
 git clone https://github.com/kaito-project/kaito-cookbook.git
 cd kaito-cookbook/examples/qdrant-rag-autoindexer
+./deploy-on-kind.sh
 ```
 
-### Helm Deployment
+This script will:
+- Create a kind cluster with proper configuration
+- Install Karpenter for node provisioning
+- Deploy KAITO RAGEngine and AutoIndexer via Helm charts
+- Deploy Qdrant vector database
+- Create RAGEngine and AutoIndexer custom resources
+- Provide monitoring and access commands
 
-```
-helm install qdrant-rag ./chart --wait --wait-for-jobs --timeout 10m
-```
-
-
-1. Install KAITO AutoIndexer
-
-```bash
-helm upgrade --install kaito-autoindexer oci://ghcr.io/kaito-project/charts/autoindexer \
---version 0.0.0-dev.2 \
---namespace kaito-autoindexer \
---create-namespace \
---take-ownership
-```
-
-2. Deploy [`kaito-code-autoindexer`](./kaito-code-autoindexer.yaml) and [`kaito-docs-autoindexer`](./kaito-docs-autoindexer.yaml) custom resources.
-
-```bash
-kubectl apply -f kaito-code-autoindexer.yaml
-kubectl apply -f kaito-docs-autoindexer.yaml
-```
+The deployment includes Karpenter for advanced node provisioning capabilities, even in the local kind environment.
 
 Once deployed, you can validate the custom resources are deployed with `kubectl get ragai`.
 
@@ -123,15 +64,10 @@ k logs kaito-code-autoindexer-job-2dxdg | grep body
 
 ## Query The RAGEngine for Relevant Context
 
-Once the AutoIndexers have completed you can now query the AutoIndexer `/retrieve` API to leverage hybrid seach functionality and get relevant context.
+Once the AutoIndexers have completed you can now query the AutoIndexer `/retrieve` API to leverage hybrid seach functionality and get relevant context. The deployment script opens a local port at `localhost:5789` to the ragengine
 
-1. Port Forward the RAGEngine Service
 
-```bash
-kubectl port-forward svc/ragengine 5789:80
-```
-
-2. Query the `/retrieve` endpoint
+1. Query the `/retrieve` endpoint
 
 ```bash
 curl -X POST http://localhost:5789/retrieve \

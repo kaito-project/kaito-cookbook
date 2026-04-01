@@ -9,7 +9,7 @@ spec:
     instanceType: "Standard_D8_v3"
     labelSelector:
       matchLabels:
-        workload: ragengine
+        kubernetes.io/hostname: "kaito-ragengine-cluster-worker"
   embedding:
     local:
       modelID: "BAAI/bge-small-en-v1.5"

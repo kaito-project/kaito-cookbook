@@ -1,0 +1,37 @@
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+name: kaito-ragengine-cluster
+nodes:
+- role: control-plane
+  kubeadmConfigPatches:
+  - |
+    kind: InitConfiguration
+    nodeRegistration:
+      kubeletExtraArgs:
+        node-labels: "ingress-ready=true,node.kubernetes.io/instance-type=Standard_D8_v3"
+  extraPortMappings:
+  # RAGEngine service access
+  - containerPort: 30789
+    hostPort: 5789
+    protocol: TCP
+  # Optional: for accessing other services via localhost  
+  - containerPort: 30080
+    hostPort: 30080
+    protocol: TCP
+  - containerPort: 30443
+    hostPort: 30443
+    protocol: TCP
+- role: worker
+  extraMounts:
+  # Mount for local storage
+  - hostPath: /tmp/kind-storage
+    containerPath: /tmp/hostpath-provisioner
+  kubeadmConfigPatches:
+  - |
+    kind: JoinConfiguration
+    nodeRegistration:
+      kubeletExtraArgs:
+        # Increase memory and storage for AI workloads
+        system-reserved: "cpu=200m,memory=512Mi"
+        kube-reserved: "cpu=200m,memory=512Mi"
+        node-labels: "node.kubernetes.io/instance-type=Standard_D8_v3"

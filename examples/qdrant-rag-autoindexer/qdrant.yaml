@@ -53,24 +53,15 @@ spec:
           timeoutSeconds: 1
         resources:
           limits:
-            cpu: "14"
-            memory: 56Gi
+            cpu: "2"
+            memory: 4Gi
           requests:
-            cpu: "8"
-            memory: 32Gi
+            cpu: "0.5"
+            memory: 1Gi
         terminationMessagePath: /dev/termination-log
         terminationMessagePolicy: File
-        volumeMounts:
-        - mountPath: /qdrant/storage
-          name: qdrant-data
       dnsPolicy: ClusterFirst
-      nodeSelector:
-        workload: qdrant
       restartPolicy: Always
       schedulerName: default-scheduler
       securityContext: {}
       terminationGracePeriodSeconds: 30
-      volumes:
-      - name: qdrant-data
-        persistentVolumeClaim:
-          claimName: qdrant-storage

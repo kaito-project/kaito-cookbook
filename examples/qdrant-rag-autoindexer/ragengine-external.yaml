@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: ragengine-external
+  namespace: default
+  labels:
+    app: ragengine-external
+spec:
+  type: NodePort
+  ports:
+  - port: 80
+    targetPort: 5000
+    nodePort: 30789
+    protocol: TCP
+    name: http
+  selector:
+    kaito.sh/ragengine: ragengine
