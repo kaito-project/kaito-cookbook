@@ -1,0 +1,21 @@
+apiVersion: kaito.sh/v1beta1
+kind: RAGEngine
+metadata:
+  name: ragengine
+  namespace: default
+spec:
+  compute:
+    count: 1
+    instanceType: "Standard_D8_v3"
+    labelSelector:
+      matchLabels:
+        kubernetes.io/hostname: "kaito-ragengine-cluster-worker"
+  embedding:
+    local:
+      modelID: "BAAI/bge-small-en-v1.5"
+  inferenceService:
+    contextWindowSize: 4096
+  storage:
+    vectorDB:
+      engine: qdrant
+      url: http://qdrant.default.svc.cluster.local:6333

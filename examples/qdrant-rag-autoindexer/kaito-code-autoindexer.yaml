@@ -1,0 +1,18 @@
+apiVersion: autoindexer.kaito.sh/v1alpha1
+kind: AutoIndexer
+metadata:
+  name: kaito-code-autoindexer
+spec:
+  dataSource:
+    git:
+      branch: main
+      repository: https://github.com/kaito-project/kaito.git
+      paths:
+        - '*.go'
+        - '*.py'
+        - '*.yaml'
+    type: Git
+  driftRemediationPolicy:
+    strategy: Manual
+  indexName: kaito-codebase
+  ragEngine: ragengine
