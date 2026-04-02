@@ -128,8 +128,11 @@ Follow the official guides to install the vendor controllers, then apply the exa
 
 - Azure (Application Gateway for Containers - Gateway API):
   - Docs: https://learn.microsoft.com/azure/application-gateway/for-containers/
-  - Quickstart (AKS add-on): https://learn.microsoft.com/azure/application-gateway/for-containers/quickstart-configure-aks-addon
-  - Apply after install: `agc/gateway-azure.yaml` and `agc/httproute.yaml`
+  - Quickstart (Install AKS add-on): https://learn.microsoft.com/en-us/azure/application-gateway/for-containers/quickstart-deploy-application-gateway-for-containers-alb-controller?tabs=install-helm-windows
+  - Create Application Gateway for Containers: https://learn.microsoft.com/en-us/azure/application-gateway/for-containers/quickstart-create-application-gateway-for-containers-managed-by-alb-controller?tabs=new-subnet-aks-vnet 
+    * Ensure subnet of application gateway has more than 400 ip addresses instead of 250 ip addresses
+  - Apply after application gateway creation: `agc/gateway-azure.yaml` and `agc/httproute.yaml`
+    * Ensure annotations: `alb.networking.azure.io/alb-namespace` and `alb.networking.azure.io/alb-name` in `agc/gateway-azure.yaml` refer to the created ApplicationLoadBalancer in the above step.
 
 - AWS (AWS Load Balancer Controller - ALB Ingress):
   - Docs: https://kubernetes-sigs.github.io/aws-load-balancer-controller/latest/
